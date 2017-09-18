@@ -246,5 +246,56 @@ Q7) Display those employees details containing salary format as $2,700.00
     +------------+--------------------------+--------------+------------+-------------------------------------------------------------------------+
 
 Q8) Write query to Add remarks of those employee which are never remarked before.
+
+    UPDATE employee SET remarks = CONCAT(name, ' has been a very good employee') WHERE remarks IS NULL;
+    
+    SELECT * FROM employee;
+    +------------+--------------------------+--------------+--------+-------------------------------------------------------------------------+
+    | EmployeeID | Name                     | Position     | Salary | Remarks                                                                 |
+    +------------+--------------------------+--------------+--------+-------------------------------------------------------------------------+
+    |          1 | Phillip J. Fry           | Delivery boy |   7500 | Not to be confused with the Philip J. Fry from Hovering Squid World 97a |
+    |          2 | Turanga Leela            | Captain      |  10000 | Turanga Leela has been a very good employee                             |
+    |          3 | Bender Bending Rodriguez | Robot        |   7500 | Bender Bending Rodriguez has been a very good employee                  |
+    |          4 | Hubert J. Farnsworth     | CEO          |  20000 | Hubert J. Farnsworth has been a very good employee                      |
+    |          5 | John A. Zoidberg         | Physician    |     25 | John A. Zoidberg has been a very good employee                          |
+    |          6 | Amy Wong                 | Intern       |   5000 | Amy Wong has been a very good employee                                  |
+    |          7 | Hermes Conrad            | Bureaucrat   |  10000 | Hermes Conrad has been a very good employee                             |
+    |          8 | Scruffy Scruffington     | Janitor      |   5000 | Scruffy Scruffington has been a very good employee                      |
+    +------------+--------------------------+--------------+--------+-------------------------------------------------------------------------+
+
 Q9) Display employee details in following format "Phillip J. Fry is Delivery boy and earns $7,500.00/month"
+
+    CREATE VIEW v9 AS SELECT CONCAT(name, ' is ', position,  ' and earns $', CONVERT(FORMAT(salary, 2) using utf8), '/month') as employeeDescription FROM employee;
+
+    SELECT * FROM v9;
+    +-------------------------------------------------------------+
+    | employeeDescription                                         |
+    +-------------------------------------------------------------+
+    | Phillip J. Fry is Delivery boy and earns $7,500.00/month    |
+    | Turanga Leela is Captain and earns $10,000.00/month         |
+    | Bender Bending Rodriguez is Robot and earns $7,500.00/month |
+    | Hubert J. Farnsworth is CEO and earns $20,000.00/month      |
+    | John A. Zoidberg is Physician and earns $25.00/month        |
+    | Amy Wong is Intern and earns $5,000.00/month                |
+    | Hermes Conrad is Bureaucrat and earns $10,000.00/month      |
+    | Scruffy Scruffington is Janitor and earns $5,000.00/month   |
+    +-------------------------------------------------------------+
+
 Q10) Update shipment date to current date for all data having NULL value
+
+      UPDATE shipment SET shipmentDate = CURDATE() WHERE shipmentDate IS NULL;
+      Query OK, 3 rows affected (0.06 sec)
+      Rows matched: 3  Changed: 3  Warnings: 0
+
+      SELECT * FROM shipment;
+      +------------+--------------+---------+--------+
+      | ShipmentID | ShipmentDate | Manager | Planet |
+      +------------+--------------+---------+--------+
+      |          1 | 3004-05-11   |       1 |      1 |
+      |          2 | 3004-05-11   |       1 |      2 |
+      |          3 | 2017-09-18   |       2 |      3 |
+      |          4 | 2017-09-18   |       2 |      4 |
+      |          5 | 2017-09-18   |       7 |      5 |
+      +------------+--------------+---------+--------+
+
+
