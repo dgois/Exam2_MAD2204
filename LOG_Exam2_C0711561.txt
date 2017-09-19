@@ -1,0 +1,1745 @@
+MariaDB [ExamC0711561]> show tables;
++------------------------+
+| Tables_in_examc0711561 |
++------------------------+
+| client                 |
+| employee               |
+| has_clearance          |
+| package                |
+| planet                 |
+| shipment               |
++------------------------+
+6 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT * FROM employee;
++------------+--------------------------+--------------+--------+-------------------------------------------------------------------------+
+| EmployeeID | Name                     | Position     | Salary | Remarks                                                                 |
++------------+--------------------------+--------------+--------+-------------------------------------------------------------------------+
+|          1 | Phillip J. Fry           | Delivery boy |   7500 | Not to be confused with the Philip J. Fry from Hovering Squid World 97a |
+|          2 | Turanga Leela            | Captain      |  10000 | NULL                                                                    |
+|          3 | Bender Bending Rodriguez | Robot        |   7500 | NULL                                                                    |
+|          4 | Hubert J. Farnsworth     | CEO          |  20000 | NULL                                                                    |
+|          5 | John A. Zoidberg         | Physician    |     25 | NULL                                                                    |
+|          6 | Amy Wong                 | Intern       |   5000 | NULL                                                                    |
+|          7 | Hermes Conrad            | Bureaucrat   |  10000 | NULL                                                                    |
+|          8 | Scruffy Scruffington     | Janitor      |   5000 | NULL                                                                    |
++------------+--------------------------+--------------+--------+-------------------------------------------------------------------------+
+8 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT * FROM shipment;
++------------+------------+---------+--------+
+| ShipmentID | Date       | Manager | Planet |
++------------+------------+---------+--------+
+|          1 | 3004/05/11 |       1 |      1 |
+|          2 | 3004/05/11 |       1 |      2 |
+|          3 | NULL       |       2 |      3 |
+|          4 | NULL       |       2 |      4 |
+|          5 | NULL       |       7 |      5 |
++------------+------------+---------+--------+
+5 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT * FROM employee WHERE name = 'Turanga Leela';
++------------+---------------+----------+--------+---------+
+| EmployeeID | Name          | Position | Salary | Remarks |
++------------+---------------+----------+--------+---------+
+|          2 | Turanga Leela | Captain  |  10000 | NULL    |
++------------+---------------+----------+--------+---------+
+1 row in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT * FROM employee e INNER JOIN shipment s ON e.employeeId = s.manager WHERE name = 'Turanga Leela';
++------------+---------------+----------+--------+---------+------------+------+---------+--------+
+| EmployeeID | Name          | Position | Salary | Remarks | ShipmentID | Date | Manager | Planet |
++------------+---------------+----------+--------+---------+------------+------+---------+--------+
+|          2 | Turanga Leela | Captain  |  10000 | NULL    |          3 | NULL |       2 |      3 |
+|          2 | Turanga Leela | Captain  |  10000 | NULL    |          4 | NULL |       2 |      4 |
++------------+---------------+----------+--------+---------+------------+------+---------+--------+
+2 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> CREATE VIEW v1 AS SELECT * FROM employee e INNER JOIN shipment s ON e.employeeId = s.manager WHERE name = 'Turanga Leela';
+Query OK, 0 rows affected (0.09 sec)
+
+MariaDB [ExamC0711561]> select * from v1;
++------------+---------------+----------+--------+---------+------------+------+---------+--------+
+| EmployeeID | Name          | Position | Salary | Remarks | ShipmentID | Date | Manager | Planet |
++------------+---------------+----------+--------+---------+------------+------+---------+--------+
+|          2 | Turanga Leela | Captain  |  10000 | NULL    |          3 | NULL |       2 |      3 |
+|          2 | Turanga Leela | Captain  |  10000 | NULL    |          4 | NULL |       2 |      4 |
++------------+---------------+----------+--------+---------+------------+------+---------+--------+
+2 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT * FROM package WHERE recipient IN (1, 5, 6);
++----------+---------------+------------+--------+--------+-----------+
+| Shipment | PackageNumber | Contents   | Weight | Sender | Recipient |
++----------+---------------+------------+--------+--------+-----------+
+|        3 |             2 | Undeclared |      3 |      5 |         1 |
+|        4 |             1 | Undeclared |      5 |      4 |         5 |
+|        5 |             1 | Undeclared |    100 |      5 |         1 |
++----------+---------------+------------+--------+--------+-----------+
+3 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> CREATE VIEW v2 AS SELECT * FROM package WHERE recipient IN (1, 5, 6);
+Query OK, 0 rows affected (0.02 sec)
+
+MariaDB [ExamC0711561]> SELECT * FROM v2;
++----------+---------------+------------+--------+--------+-----------+
+| Shipment | PackageNumber | Contents   | Weight | Sender | Recipient |
++----------+---------------+------------+--------+--------+-----------+
+|        3 |             2 | Undeclared |      3 |      5 |         1 |
+|        4 |             1 | Undeclared |      5 |      4 |         5 |
+|        5 |             1 | Undeclared |    100 |      5 |         1 |
++----------+---------------+------------+--------+--------+-----------+
+3 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT * FROM has_clearance;
++----------+--------+-------+
+| Employee | Planet | Level |
++----------+--------+-------+
+|        1 |      1 |     2 |
+|        1 |      2 |     3 |
+|        2 |      3 |     2 |
+|        2 |      4 |     4 |
+|        3 |      5 |     2 |
+|        3 |      6 |     4 |
+|        4 |      7 |     1 |
++----------+--------+-------+
+7 rows in set (0.02 sec)
+
+MariaDB [ExamC0711561]> SELECT e.name, p.name FROM employee e INNER JOIN has_clearance h ON e.employeeid = h.employee INNER JOIN planet p ON h.planet = p.planetid;
++--------------------------+------------------+
+| name                     | name             |
++--------------------------+------------------+
+| Phillip J. Fry           | Omicron Persei 8 |
+| Phillip J. Fry           | Decapod X        |
+| Turanga Leela            | Mars             |
+| Turanga Leela            | Omega III        |
+| Bender Bending Rodriguez | Tarantulon VI    |
+| Bender Bending Rodriguez | Cannibalon       |
+| Hubert J. Farnsworth     | DogDoo VII       |
++--------------------------+------------------+
+7 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT e.name, p.name FROM employee e, has_clearance h, planet p WHERE e.employeeId = h.employee AND h.planet = p.planetId;
++--------------------------+------------------+
+| name                     | name             |
++--------------------------+------------------+
+| Phillip J. Fry           | Omicron Persei 8 |
+| Phillip J. Fry           | Decapod X        |
+| Turanga Leela            | Mars             |
+| Turanga Leela            | Omega III        |
+| Bender Bending Rodriguez | Tarantulon VI    |
+| Bender Bending Rodriguez | Cannibalon       |
+| Hubert J. Farnsworth     | DogDoo VII       |
++--------------------------+------------------+
+7 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> CREATE VIEW v2 AS SELECT e.name, p.name FROM employee e INNER JOIN has_clearance h ON e.employeeid = h.employee INNER JOIN planet p ON h.planet = p.planetid;
+ERROR 1060 (42S21): Duplicate column name 'name'
+MariaDB [ExamC0711561]> CREATE VIEW v3 AS SELECT e.name, p.name FROM employee e INNER JOIN has_clearance h ON e.employeeid = h.employee INNER JOIN planet p ON h.planet = p.planetid;
+ERROR 1060 (42S21): Duplicate column name 'name'
+MariaDB [ExamC0711561]> show tables;
++------------------------+
+| Tables_in_examc0711561 |
++------------------------+
+| client                 |
+| employee               |
+| has_clearance          |
+| package                |
+| planet                 |
+| shipment               |
+| v1                     |
+| v2                     |
++------------------------+
+8 rows in set (0.01 sec)
+
+MariaDB [ExamC0711561]> select * from v2;
++----------+---------------+------------+--------+--------+-----------+
+| Shipment | PackageNumber | Contents   | Weight | Sender | Recipient |
++----------+---------------+------------+--------+--------+-----------+
+|        3 |             2 | Undeclared |      3 |      5 |         1 |
+|        4 |             1 | Undeclared |      5 |      4 |         5 |
+|        5 |             1 | Undeclared |    100 |      5 |         1 |
++----------+---------------+------------+--------+--------+-----------+
+3 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> CREATE VIEW v3 AS SELECT e.name AS 'Employee Name', p.name AS 'Planet Name' FROM employee e INNER JOIN has_clearance h ON e.employeeid = h.employee INNER JOIN planet p ON h.planet = p.planetid;
+Query OK, 0 rows affected (0.05 sec)
+
+MariaDB [ExamC0711561]> SELECT e.name AS 'Employee Name', p.name AS 'Planet Name' FROM employee e INNER JOIN has_clearance h ON e.employeeid = h.employee INNER JOIN planet p ON h.planet = p.planetid;
++--------------------------+------------------+
+| Employee Name            | Planet Name      |
++--------------------------+------------------+
+| Phillip J. Fry           | Omicron Persei 8 |
+| Phillip J. Fry           | Decapod X        |
+| Turanga Leela            | Mars             |
+| Turanga Leela            | Omega III        |
+| Bender Bending Rodriguez | Tarantulon VI    |
+| Bender Bending Rodriguez | Cannibalon       |
+| Hubert J. Farnsworth     | DogDoo VII       |
++--------------------------+------------------+
+7 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT * FROM v3;
++--------------------------+------------------+
+| Employee Name            | Planet Name      |
++--------------------------+------------------+
+| Phillip J. Fry           | Omicron Persei 8 |
+| Phillip J. Fry           | Decapod X        |
+| Turanga Leela            | Mars             |
+| Turanga Leela            | Omega III        |
+| Bender Bending Rodriguez | Tarantulon VI    |
+| Bender Bending Rodriguez | Cannibalon       |
+| Hubert J. Farnsworth     | DogDoo VII       |
++--------------------------+------------------+
+7 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> desc shipment;
++------------+---------+------+-----+---------+-------+
+| Field      | Type    | Null | Key | Default | Extra |
++------------+---------+------+-----+---------+-------+
+| ShipmentID | int(11) | NO   | PRI | NULL    |       |
+| Date       | text    | YES  |     | NULL    |       |
+| Manager    | int(11) | NO   |     | NULL    |       |
+| Planet     | int(11) | NO   |     | NULL    |       |
++------------+---------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> ALTER TABLE shipment CHANGE "Date" "ShipmentDate" DATE;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near '"Date" "ShipmentDate" DATE' at line 1
+MariaDB [ExamC0711561]> ALTER TABLE shipment RENAME COLUMN "Date" "ShipmentDate" DATE;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'COLUMN "Date" "ShipmentDate" DATE' at line 1
+MariaDB [ExamC0711561]> ALTER TABLE shipment RENAME COLUMN "Date" "ShipmentDate" TEXT;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'COLUMN "Date" "ShipmentDate" TEXT' at line 1
+MariaDB [ExamC0711561]> ALTER TABLE shipment RENAME COLUMN "Date" TO "ShipmentDate" TEXT;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'COLUMN "Date" TO "ShipmentDate" TEXT' at line 1
+MariaDB [ExamC0711561]> ALTER TABLE shipment RENAME COLUMN "Date" TO "ShipmentDate";
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'COLUMN "Date" TO "ShipmentDate"' at line 1
+MariaDB [ExamC0711561]> ALTER TABLE shipment CHANGE 'Date' 'ShipmentDate' DATE;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near ''Date' 'ShipmentDate' DATE' at line 1
+MariaDB [ExamC0711561]> ALTER TABLE shipment CHANGE 'Date' 'ShipmentDate';
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near ''Date' 'ShipmentDate'' at line 1
+MariaDB [ExamC0711561]> ALTER TABLE shipment CHANGE 'Date' 'ShipmentDate' TEXT;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near ''Date' 'ShipmentDate' TEXT' at line 1
+MariaDB [ExamC0711561]> ALTER TABLE shipment CHANGE COLUMN 'Date' 'ShipmentDate' TEXT;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near ''Date' 'ShipmentDate' TEXT' at line 1
+MariaDB [ExamC0711561]> ALTER TABLE shipment CHANGE COLUMN Date ShipmentDate TEXT;
+Query OK, 0 rows affected (0.13 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+MariaDB [ExamC0711561]> DESC shipment;
++--------------+---------+------+-----+---------+-------+
+| Field        | Type    | Null | Key | Default | Extra |
++--------------+---------+------+-----+---------+-------+
+| ShipmentID   | int(11) | NO   | PRI | NULL    |       |
+| ShipmentDate | text    | YES  |     | NULL    |       |
+| Manager      | int(11) | NO   |     | NULL    |       |
+| Planet       | int(11) | NO   |     | NULL    |       |
++--------------+---------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> ALTER TABLE shipment CHANGE ShipmentDate ShipmentDate DATE;
+Query OK, 5 rows affected (0.75 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+MariaDB [ExamC0711561]> SELECT * FROM shipment;
++------------+--------------+---------+--------+
+| ShipmentID | ShipmentDate | Manager | Planet |
++------------+--------------+---------+--------+
+|          1 | 3004-05-11   |       1 |      1 |
+|          2 | 3004-05-11   |       1 |      2 |
+|          3 | NULL         |       2 |      3 |
+|          4 | NULL         |       2 |      4 |
+|          5 | NULL         |       7 |      5 |
++------------+--------------+---------+--------+
+5 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT s.shipmentDate, p.sender, p.recipient FROM shipment s INNER JOIN package p ON s.shipmentId = p.shipment;
++--------------+--------+-----------+
+| shipmentDate | sender | recipient |
++--------------+--------+-----------+
+| 3004-05-11   |      1 |         2 |
+| 3004-05-11   |      2 |         3 |
+| 3004-05-11   |      8 |         7 |
+| NULL         |      3 |         4 |
+| NULL         |      5 |         1 |
+| NULL         |      2 |         3 |
+| NULL         |      4 |         5 |
+| NULL         |      1 |         2 |
+| NULL         |      5 |         1 |
++--------------+--------+-----------+
+9 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT s.shipmentDate, p.sender, p.recipient FROM shipment s INNER JOIN package p ON s.shipmentId = p.shipment WHERE weight BETWEEN 5 AND 10;
++--------------+--------+-----------+
+| shipmentDate | sender | recipient |
++--------------+--------+-----------+
+| 3004-05-11   |      2 |         3 |
+| NULL         |      2 |         3 |
+| NULL         |      4 |         5 |
++--------------+--------+-----------+
+3 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT s.shipmentDate, p.sender, p.recipient FROM shipment s INNER JOIN package p ON s.shipmentId = p.shipment WHERE weight BETWEEN 5 AND 10;
++--------------+--------+-----------+
+| shipmentDate | sender | recipient |
++--------------+--------+-----------+
+| 3004-05-11   |      2 |         3 |
+| NULL         |      2 |         3 |
+| NULL         |      4 |         5 |
++--------------+--------+-----------+
+3 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]>  SELECT s.shipmentDate, p.sender, p.recipient 
+    ->  FROM shipment s 
+    ->  INNER JOIN package p 
+    ->  ON s.shipmentId = p.shipment 
+    ->  INNER JOIN client c
+    ->  ON c.accountNumber = p.sender
+    ->  INNER JOIN client c
+    ->  ON c.accountNumber = p.recipient
+    -> WHERE weight BETWEEN 5 AND 10;
+ERROR 1066 (42000): Not unique table/alias: 'c'
+MariaDB [ExamC0711561]> 
+MariaDB [ExamC0711561]>  SELECT s.shipmentDate, p.sender, p.recipient 
+    ->  FROM shipment s 
+    ->  INNER JOIN package p 
+    ->  ON s.shipmentId = p.shipment 
+    ->  INNER JOIN client sender
+    ->  ON sender.accountNumber = p.sender
+    ->  INNER JOIN client recipient
+    ->  ON recipient.accountNumber = p.recipient
+    -> WHERE weight BETWEEN 5 AND 10;
++--------------+--------+-----------+
+| shipmentDate | sender | recipient |
++--------------+--------+-----------+
+| 3004-05-11   |      2 |         3 |
+| NULL         |      2 |         3 |
+| NULL         |      4 |         5 |
++--------------+--------+-----------+
+3 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT s.shipmentDate, sender.name, recipient.name 
+    ->  FROM shipment s 
+    ->  INNER JOIN package p 
+    ->  ON s.shipmentId = p.shipment 
+    ->  INNER JOIN client sender
+    ->  ON sender.accountNumber = p.sender
+    ->  INNER JOIN client recipient
+    ->  ON recipient.accountNumber = p.recipient
+    -> WHERE weight BETWEEN 5 AND 10;
++--------------+-----------------+---------------+
+| shipmentDate | name            | name          |
++--------------+-----------------+---------------+
+| 3004-05-11   | Al Gore's Head  | Barbados Slim |
+| NULL         | Al Gore's Head  | Barbados Slim |
+| NULL         | Ogden Wernstrom | Leo Wong      |
++--------------+-----------------+---------------+
+3 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> select * from shipment;
++------------+--------------+---------+--------+
+| ShipmentID | ShipmentDate | Manager | Planet |
++------------+--------------+---------+--------+
+|          1 | 3004-05-11   |       1 |      1 |
+|          2 | 3004-05-11   |       1 |      2 |
+|          3 | NULL         |       2 |      3 |
+|          4 | NULL         |       2 |      4 |
+|          5 | NULL         |       7 |      5 |
++------------+--------------+---------+--------+
+5 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> select * from pacakage;
+ERROR 1146 (42S02): Table 'examc0711561.pacakage' doesn't exist
+MariaDB [ExamC0711561]> select * from package;
++----------+---------------+-------------------+--------+--------+-----------+
+| Shipment | PackageNumber | Contents          | Weight | Sender | Recipient |
++----------+---------------+-------------------+--------+--------+-----------+
+|        1 |             1 | Undeclared        |    1.5 |      1 |         2 |
+|        2 |             1 | Undeclared        |     10 |      2 |         3 |
+|        2 |             2 | A bucket of krill |      2 |      8 |         7 |
+|        3 |             1 | Undeclared        |     15 |      3 |         4 |
+|        3 |             2 | Undeclared        |      3 |      5 |         1 |
+|        3 |             3 | Undeclared        |      7 |      2 |         3 |
+|        4 |             1 | Undeclared        |      5 |      4 |         5 |
+|        4 |             2 | Undeclared        |     27 |      1 |         2 |
+|        5 |             1 | Undeclared        |    100 |      5 |         1 |
++----------+---------------+-------------------+--------+--------+-----------+
+9 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> select * from client;
++---------------+-------------------+
+| AccountNumber | Name              |
++---------------+-------------------+
+|             1 | Zapp Brannigan    |
+|             2 | Al Gore's Head    |
+|             3 | Barbados Slim     |
+|             4 | Ogden Wernstrom   |
+|             5 | Leo Wong          |
+|             6 | Lrrr              |
+|             7 | John Zoidberg     |
+|             8 | John Zoidfarb     |
+|             9 | Morbo             |
+|            10 | Judge John Whitey |
+|            11 | Calculon          |
++---------------+-------------------+
+11 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> select * from package where weight BETWEEN 5 and 10;
++----------+---------------+------------+--------+--------+-----------+
+| Shipment | PackageNumber | Contents   | Weight | Sender | Recipient |
++----------+---------------+------------+--------+--------+-----------+
+|        2 |             1 | Undeclared |     10 |      2 |         3 |
+|        3 |             3 | Undeclared |      7 |      2 |         3 |
+|        4 |             1 | Undeclared |      5 |      4 |         5 |
++----------+---------------+------------+--------+--------+-----------+
+3 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]>  SELECT s.shipmentDate, sender.name AS 'sender', recipient.name AS 'recipient'
+    ->  FROM shipment s 
+    ->  INNER JOIN package p 
+    ->  ON s.shipmentId = p.shipment 
+    ->  INNER JOIN client sender
+    ->  ON sender.accountNumber = p.sender
+    ->  INNER JOIN client recipient
+    ->  ON recipient.accountNumber = p.recipient
+    -> WHERE weight BETWEEN 5 AND 10;
++--------------+-----------------+---------------+
+| shipmentDate | sender          | recipient     |
++--------------+-----------------+---------------+
+| 3004-05-11   | Al Gore's Head  | Barbados Slim |
+| NULL         | Al Gore's Head  | Barbados Slim |
+| NULL         | Ogden Wernstrom | Leo Wong      |
++--------------+-----------------+---------------+
+3 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> show tables;
++------------------------+
+| Tables_in_examc0711561 |
++------------------------+
+| client                 |
+| employee               |
+| has_clearance          |
+| package                |
+| planet                 |
+| shipment               |
+| v1                     |
+| v2                     |
+| v3                     |
++------------------------+
+9 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> CREATE VIEW v4 AS  SELECT s.shipmentDate, sender.name AS 'sender', recipient.name AS 'recipient'
+    ->  FROM shipment s 
+    ->  INNER JOIN package p 
+    ->  ON s.shipmentId = p.shipment 
+    ->  INNER JOIN client sender
+    ->  ON sender.accountNumber = p.sender
+    ->  INNER JOIN client recipient
+    ->  ON recipient.accountNumber = p.recipient
+    -> WHERE weight BETWEEN 5 AND 10;
+Query OK, 0 rows affected (0.05 sec)
+
+MariaDB [ExamC0711561]> SELECT * FROM v4;
++--------------+-----------------+---------------+
+| shipmentDate | sender          | recipient     |
++--------------+-----------------+---------------+
+| 3004-05-11   | Al Gore's Head  | Barbados Slim |
+| NULL         | Al Gore's Head  | Barbados Slim |
+| NULL         | Ogden Wernstrom | Leo Wong      |
++--------------+-----------------+---------------+
+3 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT * FROM v4;
++--------------+-----------------+---------------+
+| shipmentDate | sender          | recipient     |
++--------------+-----------------+---------------+
+| 3004-05-11   | Al Gore's Head  | Barbados Slim |
+| NULL         | Al Gore's Head  | Barbados Slim |
+| NULL         | Ogden Wernstrom | Leo Wong      |
++--------------+-----------------+---------------+
+3 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]>  SELECT DATE_FORMAT(s.shipmentDate, '%M, %d %y'), sender.name AS 'sender', recipient.name AS 'recipient'
+    ->  FROM shipment s 
+    ->  INNER JOIN package p 
+    ->  ON s.shipmentId = p.shipment 
+    ->  INNER JOIN client sender
+    ->  ON sender.accountNumber = p.sender
+    ->  INNER JOIN client recipient
+    ->  ON recipient.accountNumber = p.recipient
+    -> WHERE weight BETWEEN 5 AND 10;
++------------------------------------------+-----------------+---------------+
+| DATE_FORMAT(s.shipmentDate, '%M, %d %y') | sender          | recipient     |
++------------------------------------------+-----------------+---------------+
+| May, 11 04                               | Al Gore's Head  | Barbados Slim |
+| NULL                                     | Al Gore's Head  | Barbados Slim |
+| NULL                                     | Ogden Wernstrom | Leo Wong      |
++------------------------------------------+-----------------+---------------+
+3 rows in set (0.05 sec)
+
+MariaDB [ExamC0711561]> SELECT DATE_FORMAT(s.shipmentDate, '%M, %d %Y'), sender.name AS 'sender', recipient.name AS 'recipient'
+    ->  FROM shipment s 
+    ->  INNER JOIN package p 
+    ->  ON s.shipmentId = p.shipment 
+    ->  INNER JOIN client sender
+    ->  ON sender.accountNumber = p.sender
+    ->  INNER JOIN client recipient
+    ->  ON recipient.accountNumber = p.recipient
+    -> WHERE weight BETWEEN 5 AND 10;
++------------------------------------------+-----------------+---------------+
+| DATE_FORMAT(s.shipmentDate, '%M, %d %Y') | sender          | recipient     |
++------------------------------------------+-----------------+---------------+
+| May, 11 3004                             | Al Gore's Head  | Barbados Slim |
+| NULL                                     | Al Gore's Head  | Barbados Slim |
+| NULL                                     | Ogden Wernstrom | Leo Wong      |
++------------------------------------------+-----------------+---------------+
+3 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> DROP VIEW v4;
+Query OK, 0 rows affected (0.00 sec)
+
+MariaDB [ExamC0711561]> CREATE VIEW v4 AS SELECT DATE_FORMAT(s.shipmentDate, '%M, %d %Y'), sender.name AS 'sender', recipient.name AS 'recipient'
+    ->  FROM shipment s 
+    ->  INNER JOIN package p 
+    ->  ON s.shipmentId = p.shipment 
+    ->  INNER JOIN client sender
+    ->  ON sender.accountNumber = p.sender
+    ->  INNER JOIN client recipient
+    ->  ON recipient.accountNumber = p.recipient
+    -> WHERE weight BETWEEN 5 AND 10;
+Query OK, 0 rows affected (0.04 sec)
+
+MariaDB [ExamC0711561]> SELECT * FROM v4;
++------------------------------------------+-----------------+---------------+
+| DATE_FORMAT(s.shipmentDate, '%M, %d %Y') | sender          | recipient     |
++------------------------------------------+-----------------+---------------+
+| May, 11 3004                             | Al Gore's Head  | Barbados Slim |
+| NULL                                     | Al Gore's Head  | Barbados Slim |
+| NULL                                     | Ogden Wernstrom | Leo Wong      |
++------------------------------------------+-----------------+---------------+
+3 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> drop view v4;
+Query OK, 0 rows affected (0.00 sec)
+
+MariaDB [ExamC0711561]> CREATE VIEW v4 AS
+    -> SELECT DATE_FORMAT(s.shipmentDate, '%M, %d %Y'), sender.name AS 'sender', recipient.name AS 'recipient'
+    ->  FROM shipment s 
+    ->  INNER JOIN package p 
+    ->  ON s.shipmentId = p.shipment 
+    ->  INNER JOIN client sender
+    ->  ON sender.accountNumber = p.sender
+    ->  INNER JOIN client recipient
+    ->  ON recipient.accountNumber = p.recipient
+    -> WHERE weight BETWEEN 5 AND 10;
+Query OK, 0 rows affected (0.06 sec)
+
+MariaDB [ExamC0711561]> SELECT DATE_FORMAT(s.shipmentDate, '%M, %d %Y'), sender.name AS 'sender', recipient.name AS 'recipient'
+    ->  FROM shipment s 
+    ->  INNER JOIN package p 
+    ->  ON s.shipmentId = p.shipment 
+    ->  INNER JOIN client sender
+    ->  ON sender.accountNumber = p.sender
+    ->  INNER JOIN client recipient
+    ->  ON recipient.accountNumber = p.recipient
+    -> WHERE weight BETWEEN 5 AND 10;
++------------------------------------------+-----------------+---------------+
+| DATE_FORMAT(s.shipmentDate, '%M, %d %Y') | sender          | recipient     |
++------------------------------------------+-----------------+---------------+
+| May, 11 3004                             | Al Gore's Head  | Barbados Slim |
+| NULL                                     | Al Gore's Head  | Barbados Slim |
+| NULL                                     | Ogden Wernstrom | Leo Wong      |
++------------------------------------------+-----------------+---------------+
+3 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT * FROM v4;
++------------------------------------------+-----------------+---------------+
+| DATE_FORMAT(s.shipmentDate, '%M, %d %Y') | sender          | recipient     |
++------------------------------------------+-----------------+---------------+
+| May, 11 3004                             | Al Gore's Head  | Barbados Slim |
+| NULL                                     | Al Gore's Head  | Barbados Slim |
+| NULL                                     | Ogden Wernstrom | Leo Wong      |
++------------------------------------------+-----------------+---------------+
+3 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT * FROM planet;
++----------+------------------+------------------+
+| PlanetID | Name             | Coordinates      |
++----------+------------------+------------------+
+|        1 | Omicron Persei 8 |    89475345.3545 |
+|        2 | Decapod X        | 65498463216.3466 |
+|        3 | Mars             |   32435021.65468 |
+|        4 | Omega III        |    98432121.5464 |
+|        5 | Tarantulon VI    | 849842198.354654 |
+|        6 | Cannibalon       |  654321987.21654 |
+|        7 | DogDoo VII       |  65498721354.688 |
+|        8 | Nintenduu 64     |  6543219894.1654 |
+|        9 | Amazonia         | 65432135979.6547 |
++----------+------------------+------------------+
+9 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT * FROM shipment s INNER JOIN planet p ON s.planet = p.planetId;
++------------+--------------+---------+--------+----------+------------------+------------------+
+| ShipmentID | ShipmentDate | Manager | Planet | PlanetID | Name             | Coordinates      |
++------------+--------------+---------+--------+----------+------------------+------------------+
+|          1 | 3004-05-11   |       1 |      1 |        1 | Omicron Persei 8 |    89475345.3545 |
+|          2 | 3004-05-11   |       1 |      2 |        2 | Decapod X        | 65498463216.3466 |
+|          3 | NULL         |       2 |      3 |        3 | Mars             |   32435021.65468 |
+|          4 | NULL         |       2 |      4 |        4 | Omega III        |    98432121.5464 |
+|          5 | NULL         |       7 |      5 |        5 | Tarantulon VI    | 849842198.354654 |
++------------+--------------+---------+--------+----------+------------------+------------------+
+5 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT * FROM shipment s INNER JOIN planet p ON s.planet = p.planetId WHERE p.name = 'Mars' OR p.name = 'Amazonia'; 
++------------+--------------+---------+--------+----------+------+----------------+
+| ShipmentID | ShipmentDate | Manager | Planet | PlanetID | Name | Coordinates    |
++------------+--------------+---------+--------+----------+------+----------------+
+|          3 | NULL         |       2 |      3 |        3 | Mars | 32435021.65468 |
++------------+--------------+---------+--------+----------+------+----------------+
+1 row in set (0.00 sec)
+
+MariaDB [ExamC0711561]> select * from shipment;
++------------+--------------+---------+--------+
+| ShipmentID | ShipmentDate | Manager | Planet |
++------------+--------------+---------+--------+
+|          1 | 3004-05-11   |       1 |      1 |
+|          2 | 3004-05-11   |       1 |      2 |
+|          3 | NULL         |       2 |      3 |
+|          4 | NULL         |       2 |      4 |
+|          5 | NULL         |       7 |      5 |
++------------+--------------+---------+--------+
+5 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT s.shipmentId, s.shipmentDate, s.Manager, s.planet FROM shipment s INNER JOIN planet p ON s.planet = p.planetId WHERE p.name = 'Mars' OR p.name = 'Amazonia'; 
++------------+--------------+---------+--------+
+| shipmentId | shipmentDate | Manager | planet |
++------------+--------------+---------+--------+
+|          3 | NULL         |       2 |      3 |
++------------+--------------+---------+--------+
+1 row in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT s.shipmentId, s.shipmentDate, s.Manager, s.planet, p.name FROM shipment s INNER JOIN planet p ON s.planet = p.planetId WHERE p.name = 'Mars' OR p.name = 'Amazonia'; 
++------------+--------------+---------+--------+------+
+| shipmentId | shipmentDate | Manager | planet | name |
++------------+--------------+---------+--------+------+
+|          3 | NULL         |       2 |      3 | Mars |
++------------+--------------+---------+--------+------+
+1 row in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT s.shipmentId, s.shipmentDate, s.Manager, s.planet AS 'planetId', p.name FROM shipment s INNER JOIN planet p ON s.planet = p.planetId WHERE p.name = 'Mars' OR p.name = 'Amazonia'; 
++------------+--------------+---------+----------+------+
+| shipmentId | shipmentDate | Manager | planetId | name |
++------------+--------------+---------+----------+------+
+|          3 | NULL         |       2 |        3 | Mars |
++------------+--------------+---------+----------+------+
+1 row in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT s.shipmentId, s.shipmentDate, s.Manager, s.planet AS 'planetId', p.name FROM shipment s INNER JOIN planet p ON s.planet = p.planetId WHERE p.name = 'Mars' OR p.name = 'Amazonia'; 
++------------+--------------+---------+----------+------+
+| shipmentId | shipmentDate | Manager | planetId | name |
++------------+--------------+---------+----------+------+
+|          3 | NULL         |       2 |        3 | Mars |
++------------+--------------+---------+----------+------+
+1 row in set (0.00 sec)
+
+MariaDB [ExamC0711561]>  SELECT s.shipmentId, s.shipmentDate, s.Manager AS 'employeeId', e.'employeeName', s.planet AS 'planetId', p.name 
+    ->  FROM shipment s 
+    ->  INNER JOIN planet p ON s.planet = p.planetId 
+    ->  INNER JOIN employee e ON s.manager = e.employeeId 
+    ->  WHERE (p.name = 'Mars' OR p.name = 'Amazonia');
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near ''employeeName', s.planet AS 'planetId', p.name 
+ FROM shipment s 
+ INNER JOIN pl' at line 1
+MariaDB [ExamC0711561]>  SELECT s.shipmentId, s.shipmentDate, s.Manager AS 'employeeId', e.name AS 'employeeName', s.planet AS 'planetId', p.name 
+    ->  FROM shipment s 
+    ->  INNER JOIN planet p ON s.planet = p.planetId 
+    ->  INNER JOIN employee e ON s.manager = e.employeeId 
+    ->  WHERE (p.name = 'Mars' OR p.name = 'Amazonia');
++------------+--------------+------------+---------------+----------+------+
+| shipmentId | shipmentDate | employeeId | employeeName  | planetId | name |
++------------+--------------+------------+---------------+----------+------+
+|          3 | NULL         |          2 | Turanga Leela |        3 | Mars |
++------------+--------------+------------+---------------+----------+------+
+1 row in set (0.00 sec)
+
+MariaDB [ExamC0711561]> CREATE VIEW v5 AS 
+    ->  SELECT s.shipmentId, s.shipmentDate, s.Manager AS 'employeeId', e.name AS 'employeeName', s.planet AS 'planetId', p.name 
+    ->  FROM shipment s 
+    ->  INNER JOIN planet p ON s.planet = p.planetId 
+    ->  INNER JOIN employee e ON s.manager = e.employeeId 
+    ->  WHERE (p.name = 'Mars' OR p.name = 'Amazonia');
+Query OK, 0 rows affected (0.05 sec)
+
+MariaDB [ExamC0711561]> SELECT * FROM v5;
++------------+--------------+------------+---------------+----------+------+
+| shipmentId | shipmentDate | employeeId | employeeName  | planetId | name |
++------------+--------------+------------+---------------+----------+------+
+|          3 | NULL         |          2 | Turanga Leela |        3 | Mars |
++------------+--------------+------------+---------------+----------+------+
+1 row in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT * FROM package;
++----------+---------------+-------------------+--------+--------+-----------+
+| Shipment | PackageNumber | Contents          | Weight | Sender | Recipient |
++----------+---------------+-------------------+--------+--------+-----------+
+|        1 |             1 | Undeclared        |    1.5 |      1 |         2 |
+|        2 |             1 | Undeclared        |     10 |      2 |         3 |
+|        2 |             2 | A bucket of krill |      2 |      8 |         7 |
+|        3 |             1 | Undeclared        |     15 |      3 |         4 |
+|        3 |             2 | Undeclared        |      3 |      5 |         1 |
+|        3 |             3 | Undeclared        |      7 |      2 |         3 |
+|        4 |             1 | Undeclared        |      5 |      4 |         5 |
+|        4 |             2 | Undeclared        |     27 |      1 |         2 |
+|        5 |             1 | Undeclared        |    100 |      5 |         1 |
++----------+---------------+-------------------+--------+--------+-----------+
+9 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT * FROM package WHERE contents = 'Undeclared';
++----------+---------------+------------+--------+--------+-----------+
+| Shipment | PackageNumber | Contents   | Weight | Sender | Recipient |
++----------+---------------+------------+--------+--------+-----------+
+|        1 |             1 | Undeclared |    1.5 |      1 |         2 |
+|        2 |             1 | Undeclared |     10 |      2 |         3 |
+|        3 |             1 | Undeclared |     15 |      3 |         4 |
+|        3 |             2 | Undeclared |      3 |      5 |         1 |
+|        3 |             3 | Undeclared |      7 |      2 |         3 |
+|        4 |             1 | Undeclared |      5 |      4 |         5 |
+|        4 |             2 | Undeclared |     27 |      1 |         2 |
+|        5 |             1 | Undeclared |    100 |      5 |         1 |
++----------+---------------+------------+--------+--------+-----------+
+8 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT c.name FROM client c INNER JOIN package p ON c.accountNumber = p.sender WHERE contents = 'Undeclared';
++-----------------+
+| name            |
++-----------------+
+| Zapp Brannigan  |
+| Al Gore's Head  |
+| Barbados Slim   |
+| Leo Wong        |
+| Al Gore's Head  |
+| Ogden Wernstrom |
+| Zapp Brannigan  |
+| Leo Wong        |
++-----------------+
+8 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT c.name FROM client c INNER JOIN package p ON c.accountNumber = p.sender WHERE contents = 'Undeclared' 
+    -> UNION 
+    -> SELECT c.name FROM client c INNER JOIN package p ON c.accountNumber = p.recipient WHERE contents = 'Undeclared';
++-----------------+
+| name            |
++-----------------+
+| Zapp Brannigan  |
+| Al Gore's Head  |
+| Barbados Slim   |
+| Leo Wong        |
+| Ogden Wernstrom |
++-----------------+
+5 rows in set (0.06 sec)
+
+MariaDB [ExamC0711561]> SELECT c.name FROM client c INNER JOIN package p ON c.accountNumber = p.sender WHERE contents = 'Undeclared' 
+    -> UNION ALL
+    -> SELECT c.name FROM client c INNER JOIN package p ON c.accountNumber = p.recipient WHERE contents = 'Undeclared';
++-----------------+
+| name            |
++-----------------+
+| Zapp Brannigan  |
+| Al Gore's Head  |
+| Barbados Slim   |
+| Leo Wong        |
+| Al Gore's Head  |
+| Ogden Wernstrom |
+| Zapp Brannigan  |
+| Leo Wong        |
+| Al Gore's Head  |
+| Barbados Slim   |
+| Ogden Wernstrom |
+| Zapp Brannigan  |
+| Barbados Slim   |
+| Leo Wong        |
+| Al Gore's Head  |
+| Zapp Brannigan  |
++-----------------+
+16 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> UNION ALL
+    -> ;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'UNION ALL' at line 1
+MariaDB [ExamC0711561]> SELECT c.name FROM client c INNER JOIN package p ON c.accountNumber = p.sender WHERE contents = 'Undeclared' 
+    -> UNION
+    -> SELECT c.name FROM client c INNER JOIN package p ON c.accountNumber = p.recipient WHERE contents = 'Undeclared';
++-----------------+
+| name            |
++-----------------+
+| Zapp Brannigan  |
+| Al Gore's Head  |
+| Barbados Slim   |
+| Leo Wong        |
+| Ogden Wernstrom |
++-----------------+
+5 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT DISTINCT c.name FROM client c INNER JOIN package p ON c.accountNumber = p.sender WHERE contents = 'Undeclared' 
+    -> ;
++-----------------+
+| name            |
++-----------------+
+| Zapp Brannigan  |
+| Al Gore's Head  |
+| Barbados Slim   |
+| Leo Wong        |
+| Ogden Wernstrom |
++-----------------+
+5 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT * FROM PACKAGES;
+ERROR 1146 (42S02): Table 'examc0711561.packages' doesn't exist
+MariaDB [ExamC0711561]> SELECT * FROM PACKAGE;
++----------+---------------+-------------------+--------+--------+-----------+
+| Shipment | PackageNumber | Contents          | Weight | Sender | Recipient |
++----------+---------------+-------------------+--------+--------+-----------+
+|        1 |             1 | Undeclared        |    1.5 |      1 |         2 |
+|        2 |             1 | Undeclared        |     10 |      2 |         3 |
+|        2 |             2 | A bucket of krill |      2 |      8 |         7 |
+|        3 |             1 | Undeclared        |     15 |      3 |         4 |
+|        3 |             2 | Undeclared        |      3 |      5 |         1 |
+|        3 |             3 | Undeclared        |      7 |      2 |         3 |
+|        4 |             1 | Undeclared        |      5 |      4 |         5 |
+|        4 |             2 | Undeclared        |     27 |      1 |         2 |
+|        5 |             1 | Undeclared        |    100 |      5 |         1 |
++----------+---------------+-------------------+--------+--------+-----------+
+9 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT * FROM employee;
++------------+--------------------------+--------------+--------+-------------------------------------------------------------------------+
+| EmployeeID | Name                     | Position     | Salary | Remarks                                                                 |
++------------+--------------------------+--------------+--------+-------------------------------------------------------------------------+
+|          1 | Phillip J. Fry           | Delivery boy |   7500 | Not to be confused with the Philip J. Fry from Hovering Squid World 97a |
+|          2 | Turanga Leela            | Captain      |  10000 | NULL                                                                    |
+|          3 | Bender Bending Rodriguez | Robot        |   7500 | NULL                                                                    |
+|          4 | Hubert J. Farnsworth     | CEO          |  20000 | NULL                                                                    |
+|          5 | John A. Zoidberg         | Physician    |     25 | NULL                                                                    |
+|          6 | Amy Wong                 | Intern       |   5000 | NULL                                                                    |
+|          7 | Hermes Conrad            | Bureaucrat   |  10000 | NULL                                                                    |
+|          8 | Scruffy Scruffington     | Janitor      |   5000 | NULL                                                                    |
++------------+--------------------------+--------------+--------+-------------------------------------------------------------------------+
+8 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT employeeId, name, position, format(salary, 'en_en'), remarks FROM employee;
++------------+--------------------------+--------------+-------------------------+-------------------------------------------------------------------------+
+| employeeId | name                     | position     | format(salary, 'en_en') | remarks                                                                 |
++------------+--------------------------+--------------+-------------------------+-------------------------------------------------------------------------+
+|          1 | Phillip J. Fry           | Delivery boy | 7,500                   | Not to be confused with the Philip J. Fry from Hovering Squid World 97a |
+|          2 | Turanga Leela            | Captain      | 10,000                  | NULL                                                                    |
+|          3 | Bender Bending Rodriguez | Robot        | 7,500                   | NULL                                                                    |
+|          4 | Hubert J. Farnsworth     | CEO          | 20,000                  | NULL                                                                    |
+|          5 | John A. Zoidberg         | Physician    | 25                      | NULL                                                                    |
+|          6 | Amy Wong                 | Intern       | 5,000                   | NULL                                                                    |
+|          7 | Hermes Conrad            | Bureaucrat   | 10,000                  | NULL                                                                    |
+|          8 | Scruffy Scruffington     | Janitor      | 5,000                   | NULL                                                                    |
++------------+--------------------------+--------------+-------------------------+-------------------------------------------------------------------------+
+8 rows in set, 8 warnings (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT employeeId, name, position, CONCAT('$', FORMAT(salary, 'en_en'), '.00'), remarks FROM employee;
++------------+--------------------------+--------------+---------------------------------------------+-------------------------------------------------------------------------+
+| employeeId | name                     | position     | CONCAT('$', FORMAT(salary, 'en_en'), '.00') | remarks                                                                 |
++------------+--------------------------+--------------+---------------------------------------------+-------------------------------------------------------------------------+
+|          1 | Phillip J. Fry           | Delivery boy | $7,500.00                                   | Not to be confused with the Philip J. Fry from Hovering Squid World 97a |
+|          2 | Turanga Leela            | Captain      | $10,000.00                                  | NULL                                                                    |
+|          3 | Bender Bending Rodriguez | Robot        | $7,500.00                                   | NULL                                                                    |
+|          4 | Hubert J. Farnsworth     | CEO          | $20,000.00                                  | NULL                                                                    |
+|          5 | John A. Zoidberg         | Physician    | $25.00                                      | NULL                                                                    |
+|          6 | Amy Wong                 | Intern       | $5,000.00                                   | NULL                                                                    |
+|          7 | Hermes Conrad            | Bureaucrat   | $10,000.00                                  | NULL                                                                    |
+|          8 | Scruffy Scruffington     | Janitor      | $5,000.00                                   | NULL                                                                    |
++------------+--------------------------+--------------+---------------------------------------------+-------------------------------------------------------------------------+
+8 rows in set, 8 warnings (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT employeeId, name, position, CONCAT('$', FORMAT(salary, 'en_en'), '.00') as salary, remarks FROM employee;
++------------+--------------------------+--------------+------------+-------------------------------------------------------------------------+
+| employeeId | name                     | position     | salary     | remarks                                                                 |
++------------+--------------------------+--------------+------------+-------------------------------------------------------------------------+
+|          1 | Phillip J. Fry           | Delivery boy | $7,500.00  | Not to be confused with the Philip J. Fry from Hovering Squid World 97a |
+|          2 | Turanga Leela            | Captain      | $10,000.00 | NULL                                                                    |
+|          3 | Bender Bending Rodriguez | Robot        | $7,500.00  | NULL                                                                    |
+|          4 | Hubert J. Farnsworth     | CEO          | $20,000.00 | NULL                                                                    |
+|          5 | John A. Zoidberg         | Physician    | $25.00     | NULL                                                                    |
+|          6 | Amy Wong                 | Intern       | $5,000.00  | NULL                                                                    |
+|          7 | Hermes Conrad            | Bureaucrat   | $10,000.00 | NULL                                                                    |
+|          8 | Scruffy Scruffington     | Janitor      | $5,000.00  | NULL                                                                    |
++------------+--------------------------+--------------+------------+-------------------------------------------------------------------------+
+8 rows in set, 8 warnings (0.00 sec)
+
+MariaDB [ExamC0711561]> SHOW TABLES;
++------------------------+
+| Tables_in_examc0711561 |
++------------------------+
+| client                 |
+| employee               |
+| has_clearance          |
+| package                |
+| planet                 |
+| shipment               |
+| v1                     |
+| v2                     |
+| v3                     |
+| v4                     |
+| v5                     |
++------------------------+
+11 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> select * from v5
+    -> ;
++------------+--------------+------------+---------------+----------+------+
+| shipmentId | shipmentDate | employeeId | employeeName  | planetId | name |
++------------+--------------+------------+---------------+----------+------+
+|          3 | NULL         |          2 | Turanga Leela |        3 | Mars |
++------------+--------------+------------+---------------+----------+------+
+1 row in set (0.00 sec)
+
+MariaDB [ExamC0711561]> CREATE VIEW v6 AS SELECT employeeId, name, position, CONCAT('$', FORMAT(salary, 'en_en'), '.00') as salary, remarks FROM employee;
+Query OK, 0 rows affected (0.06 sec)
+
+MariaDB [ExamC0711561]> DROP VIEW v6;
+Query OK, 0 rows affected (0.00 sec)
+
+MariaDB [ExamC0711561]> CREATE VIEW v6_v1 AS
+    -> SELECT c.name FROM client c INNER JOIN package p ON c.accountNumber = p.sender WHERE contents = 'Undeclared' 
+    -> UNION
+    -> SELECT c.name FROM client c INNER JOIN package p ON c.accountNumber = p.recipient WHERE contents = 'Undeclared';
+Query OK, 0 rows affected (0.03 sec)
+
+MariaDB [ExamC0711561]> select * from v6_v1;
++-----------------+
+| name            |
++-----------------+
+| Zapp Brannigan  |
+| Al Gore's Head  |
+| Barbados Slim   |
+| Leo Wong        |
+| Ogden Wernstrom |
++-----------------+
+5 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> CREATE VIEW v6_v2 AS
+    -> SELECT DISTINCT c.name FROM client c INNER JOIN package p ON c.accountNumber = p.sender WHERE contents = 'Undeclared';
+Query OK, 0 rows affected (0.05 sec)
+
+MariaDB [ExamC0711561]> SELECT * FROM v6_v2;
++-----------------+
+| name            |
++-----------------+
+| Zapp Brannigan  |
+| Al Gore's Head  |
+| Barbados Slim   |
+| Leo Wong        |
+| Ogden Wernstrom |
++-----------------+
+5 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> CREATE VIEW v7 AS 
+    -> SELECT employeeId, name, position, CONCAT('$', FORMAT(salary, 'en_en'), '.00') as salary, remarks FROM employee;
+Query OK, 0 rows affected (0.06 sec)
+
+MariaDB [ExamC0711561]> SELECT * FROM v7;
++------------+--------------------------+--------------+------------+-------------------------------------------------------------------------+
+| employeeId | name                     | position     | salary     | remarks                                                                 |
++------------+--------------------------+--------------+------------+-------------------------------------------------------------------------+
+|          1 | Phillip J. Fry           | Delivery boy | $7,500.00  | Not to be confused with the Philip J. Fry from Hovering Squid World 97a |
+|          2 | Turanga Leela            | Captain      | $10,000.00 | NULL                                                                    |
+|          3 | Bender Bending Rodriguez | Robot        | $7,500.00  | NULL                                                                    |
+|          4 | Hubert J. Farnsworth     | CEO          | $20,000.00 | NULL                                                                    |
+|          5 | John A. Zoidberg         | Physician    | $25.00     | NULL                                                                    |
+|          6 | Amy Wong                 | Intern       | $5,000.00  | NULL                                                                    |
+|          7 | Hermes Conrad            | Bureaucrat   | $10,000.00 | NULL                                                                    |
+|          8 | Scruffy Scruffington     | Janitor      | $5,000.00  | NULL                                                                    |
++------------+--------------------------+--------------+------------+-------------------------------------------------------------------------+
+8 rows in set, 8 warnings (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT CONCAT(name, ' is ', position, ' and earns ', CONCAT('$', FORMAT(salary, 'en_en'), '.00/month'));
+ERROR 1054 (42S22): Unknown column 'name' in 'field list'
+MariaDB [ExamC0711561]> SELECT CONCAT(name, ' is ', position, ' and earns ', CONCAT('$', FORMAT(salary, 'en_en'), '.00/month')) FROM employee;
+ERROR 1271 (HY000): Illegal mix of collations for operation 'concat'
+MariaDB [ExamC0711561]> SELECT CONCAT(name, ' is ', position, ' and earns ', '$', FORMAT(salary, 'en_en'), '.00/month') FROM employee;
+ERROR 1271 (HY000): Illegal mix of collations for operation 'concat'
+MariaDB [ExamC0711561]> SELECT CONCAT(name, ' is ', position, ' and earns ', '$', FORMAT(salary, 'en_en'), '.00/month') FROM employee;
+ERROR 1271 (HY000): Illegal mix of collations for operation 'concat'
+MariaDB [ExamC0711561]> SELECT CONCAT(name, ' is ', position) FROM employee;
++-----------------------------------+
+| CONCAT(name, ' is ', position)    |
++-----------------------------------+
+| Phillip J. Fry is Delivery boy    |
+| Turanga Leela is Captain          |
+| Bender Bending Rodriguez is Robot |
+| Hubert J. Farnsworth is CEO       |
+| John A. Zoidberg is Physician     |
+| Amy Wong is Intern                |
+| Hermes Conrad is Bureaucrat       |
+| Scruffy Scruffington is Janitor   |
++-----------------------------------+
+8 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT CONCAT(name, ' is ', position,  ' and earns ') FROM employee;
++------------------------------------------------+
+| CONCAT(name, ' is ', position,  ' and earns ') |
++------------------------------------------------+
+| Phillip J. Fry is Delivery boy and earns       |
+| Turanga Leela is Captain and earns             |
+| Bender Bending Rodriguez is Robot and earns    |
+| Hubert J. Farnsworth is CEO and earns          |
+| John A. Zoidberg is Physician and earns        |
+| Amy Wong is Intern and earns                   |
+| Hermes Conrad is Bureaucrat and earns          |
+| Scruffy Scruffington is Janitor and earns      |
++------------------------------------------------+
+8 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT CONCAT(name, ' is ', position,  ' and earns $', FORMAT(salary, 'en_en')) FROM employee;
+ERROR 1271 (HY000): Illegal mix of collations for operation 'concat'
+MariaDB [ExamC0711561]> SELECT CONCAT(name, ' is ', position,  ' and earns $', FORMAT(salary, 'en')) FROM employee;
+ERROR 1271 (HY000): Illegal mix of collations for operation 'concat'
+MariaDB [ExamC0711561]> SELECT CONCAT(name, ' is ', position,  ' and earns $') FROM employee;
++-------------------------------------------------+
+| CONCAT(name, ' is ', position,  ' and earns $') |
++-------------------------------------------------+
+| Phillip J. Fry is Delivery boy and earns $      |
+| Turanga Leela is Captain and earns $            |
+| Bender Bending Rodriguez is Robot and earns $   |
+| Hubert J. Farnsworth is CEO and earns $         |
+| John A. Zoidberg is Physician and earns $       |
+| Amy Wong is Intern and earns $                  |
+| Hermes Conrad is Bureaucrat and earns $         |
+| Scruffy Scruffington is Janitor and earns $     |
++-------------------------------------------------+
+8 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT CONCAT(name, ' is ', position,  ' and earns $', salary) FROM employee;
++---------------------------------------------------------+
+| CONCAT(name, ' is ', position,  ' and earns $', salary) |
++---------------------------------------------------------+
+| Phillip J. Fry is Delivery boy and earns $7500          |
+| Turanga Leela is Captain and earns $10000               |
+| Bender Bending Rodriguez is Robot and earns $7500       |
+| Hubert J. Farnsworth is CEO and earns $20000            |
+| John A. Zoidberg is Physician and earns $25             |
+| Amy Wong is Intern and earns $5000                      |
+| Hermes Conrad is Bureaucrat and earns $10000            |
+| Scruffy Scruffington is Janitor and earns $5000         |
++---------------------------------------------------------+
+8 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT CONCAT(name, ' is ', position,  ' and earns $', salary, '/month') FROM employee;
++-------------------------------------------------------------------+
+| CONCAT(name, ' is ', position,  ' and earns $', salary, '/month') |
++-------------------------------------------------------------------+
+| Phillip J. Fry is Delivery boy and earns $7500/month              |
+| Turanga Leela is Captain and earns $10000/month                   |
+| Bender Bending Rodriguez is Robot and earns $7500/month           |
+| Hubert J. Farnsworth is CEO and earns $20000/month                |
+| John A. Zoidberg is Physician and earns $25/month                 |
+| Amy Wong is Intern and earns $5000/month                          |
+| Hermes Conrad is Bureaucrat and earns $10000/month                |
+| Scruffy Scruffington is Janitor and earns $5000/month             |
++-------------------------------------------------------------------+
+8 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT CONCAT(name, ' is ', position,  ' and earns $', salary, '.00/month') FROM employee;
++----------------------------------------------------------------------+
+| CONCAT(name, ' is ', position,  ' and earns $', salary, '.00/month') |
++----------------------------------------------------------------------+
+| Phillip J. Fry is Delivery boy and earns $7500.00/month              |
+| Turanga Leela is Captain and earns $10000.00/month                   |
+| Bender Bending Rodriguez is Robot and earns $7500.00/month           |
+| Hubert J. Farnsworth is CEO and earns $20000.00/month                |
+| John A. Zoidberg is Physician and earns $25.00/month                 |
+| Amy Wong is Intern and earns $5000.00/month                          |
+| Hermes Conrad is Bureaucrat and earns $10000.00/month                |
+| Scruffy Scruffington is Janitor and earns $5000.00/month             |
++----------------------------------------------------------------------+
+8 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT substr(0,1,salary) from employee;
++--------------------+
+| substr(0,1,salary) |
++--------------------+
+| 0                  |
+| 0                  |
+| 0                  |
+| 0                  |
+| 0                  |
+| 0                  |
+| 0                  |
+| 0                  |
++--------------------+
+8 rows in set (0.03 sec)
+
+MariaDB [ExamC0711561]> SELECT substr(0,2,salary) from employee;
++--------------------+
+| substr(0,2,salary) |
++--------------------+
+|                    |
+|                    |
+|                    |
+|                    |
+|                    |
+|                    |
+|                    |
+|                    |
++--------------------+
+8 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT substr(0,4,salary) from employee;
++--------------------+
+| substr(0,4,salary) |
++--------------------+
+|                    |
+|                    |
+|                    |
+|                    |
+|                    |
+|                    |
+|                    |
+|                    |
++--------------------+
+8 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT substr(1,4,salary) from employee;
++--------------------+
+| substr(1,4,salary) |
++--------------------+
+|                    |
+|                    |
+|                    |
+|                    |
+|                    |
+|                    |
+|                    |
+|                    |
++--------------------+
+8 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT substr(1,2,salary) from employee;
++--------------------+
+| substr(1,2,salary) |
++--------------------+
+|                    |
+|                    |
+|                    |
+|                    |
+|                    |
+|                    |
+|                    |
+|                    |
++--------------------+
+8 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> help
+
+General information about MariaDB can be found at
+http://mariadb.org
+
+List of all MySQL commands:
+Note that all text commands must be first on line and end with ';'
+?         (\?) Synonym for `help'.
+clear     (\c) Clear the current input statement.
+connect   (\r) Reconnect to the server. Optional arguments are db and host.
+delimiter (\d) Set statement delimiter.
+ego       (\G) Send command to mysql server, display result vertically.
+exit      (\q) Exit mysql. Same as quit.
+go        (\g) Send command to mysql server.
+help      (\h) Display this help.
+notee     (\t) Don't write into outfile.
+print     (\p) Print current command.
+prompt    (\R) Change your mysql prompt.
+quit      (\q) Quit mysql.
+rehash    (\#) Rebuild completion hash.
+source    (\.) Execute an SQL script file. Takes a file name as an argument.
+status    (\s) Get status information from the server.
+tee       (\T) Set outfile [to_outfile]. Append everything into given outfile.
+use       (\u) Use another database. Takes database name as argument.
+charset   (\C) Switch to another charset. Might be needed for processing binlog with multi-byte charsets.
+warnings  (\W) Show warnings after every statement.
+nowarning (\w) Don't show warnings after every statement.
+
+For server side help, type 'help contents'
+
+MariaDB [ExamC0711561]> SELECT substr(1,2,salary) from employee;
++--------------------+
+| substr(1,2,salary) |
++--------------------+
+|                    |
+|                    |
+|                    |
+|                    |
+|                    |
+|                    |
+|                    |
+|                    |
++--------------------+
+8 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT substr(2,salary) from employee;
++------------------+
+| substr(2,salary) |
++------------------+
+|                  |
+|                  |
+|                  |
+|                  |
+|                  |
+|                  |
+|                  |
+|                  |
++------------------+
+8 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT substr(salary,0,2) from employee;
++--------------------+
+| substr(salary,0,2) |
++--------------------+
+|                    |
+|                    |
+|                    |
+|                    |
+|                    |
+|                    |
+|                    |
+|                    |
++--------------------+
+8 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT substr(salary,0,3) from employee;
++--------------------+
+| substr(salary,0,3) |
++--------------------+
+|                    |
+|                    |
+|                    |
+|                    |
+|                    |
+|                    |
+|                    |
+|                    |
++--------------------+
+8 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT salary from employee;
++--------+
+| salary |
++--------+
+|   7500 |
+|  10000 |
+|   7500 |
+|  20000 |
+|     25 |
+|   5000 |
+|  10000 |
+|   5000 |
++--------+
+8 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT text(salary) from employee;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near '(salary) from employee' at line 1
+MariaDB [ExamC0711561]> SELECT to_text(salary) from employee;
+ERROR 1305 (42000): FUNCTION examc0711561.to_text does not exist
+MariaDB [ExamC0711561]> SELECT as_string(salary) from employee;
+ERROR 1305 (42000): FUNCTION examc0711561.as_string does not exist
+MariaDB [ExamC0711561]> SELECT to_char(salary) from employee;
+ERROR 1305 (42000): FUNCTION examc0711561.to_char does not exist
+MariaDB [ExamC0711561]> SELECT char(salary) from employee;
++--------------+
+| char(salary) |
++--------------+
+| L           |
+| '           |
+| L           |
+| N            |
+|             |
+| ˆ           |
+| '           |
+| ˆ           |
++--------------+
+8 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT string(salary) from employee;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near '(salary) from employee' at line 1
+MariaDB [ExamC0711561]> SELECT cast(salary as char) from employee;
++----------------------+
+| cast(salary as char) |
++----------------------+
+| 7500                 |
+| 10000                |
+| 7500                 |
+| 20000                |
+| 25                   |
+| 5000                 |
+| 10000                |
+| 5000                 |
++----------------------+
+8 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT substry(cast(salary as char), 0, 2) from employee;
+ERROR 1305 (42000): FUNCTION examc0711561.substry does not exist
+MariaDB [ExamC0711561]> SELECT substr(cast(salary as char), 0, 2) from employee;
++------------------------------------+
+| substr(cast(salary as char), 0, 2) |
++------------------------------------+
+|                                    |
+|                                    |
+|                                    |
+|                                    |
+|                                    |
+|                                    |
+|                                    |
+|                                    |
++------------------------------------+
+8 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT substr(cast(salary as char), 0, 2) from employee;
++------------------------------------+
+| substr(cast(salary as char), 0, 2) |
++------------------------------------+
+|                                    |
+|                                    |
+|                                    |
+|                                    |
+|                                    |
+|                                    |
+|                                    |
+|                                    |
++------------------------------------+
+8 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT CONCAT(name, ' is ', position,  ' and earns $', salary, '.00/month') FROM employee;
++----------------------------------------------------------------------+
+| CONCAT(name, ' is ', position,  ' and earns $', salary, '.00/month') |
++----------------------------------------------------------------------+
+| Phillip J. Fry is Delivery boy and earns $7500.00/month              |
+| Turanga Leela is Captain and earns $10000.00/month                   |
+| Bender Bending Rodriguez is Robot and earns $7500.00/month           |
+| Hubert J. Farnsworth is CEO and earns $20000.00/month                |
+| John A. Zoidberg is Physician and earns $25.00/month                 |
+| Amy Wong is Intern and earns $5000.00/month                          |
+| Hermes Conrad is Bureaucrat and earns $10000.00/month                |
+| Scruffy Scruffington is Janitor and earns $5000.00/month             |
++----------------------------------------------------------------------+
+8 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> select MOD(salary,1000) from employee;
++------------------+
+| MOD(salary,1000) |
++------------------+
+|              500 |
+|                0 |
+|              500 |
+|                0 |
+|               25 |
+|                0 |
+|                0 |
+|                0 |
++------------------+
+8 rows in set (0.03 sec)
+
+MariaDB [ExamC0711561]> select MOD(1000,salary) from employee;
++------------------+
+| MOD(1000,salary) |
++------------------+
+|             1000 |
+|             1000 |
+|             1000 |
+|             1000 |
+|                0 |
+|             1000 |
+|             1000 |
+|             1000 |
++------------------+
+8 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> select MOD(salary,1000) from employee;
++------------------+
+| MOD(salary,1000) |
++------------------+
+|              500 |
+|                0 |
+|              500 |
+|                0 |
+|               25 |
+|                0 |
+|                0 |
+|                0 |
++------------------+
+8 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> select MOD(salary,100) from employee;
++-----------------+
+| MOD(salary,100) |
++-----------------+
+|               0 |
+|               0 |
+|               0 |
+|               0 |
+|              25 |
+|               0 |
+|               0 |
+|               0 |
++-----------------+
+8 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> select MOD(salary,1000) from employee;
++------------------+
+| MOD(salary,1000) |
++------------------+
+|              500 |
+|                0 |
+|              500 |
+|                0 |
+|               25 |
+|                0 |
+|                0 |
+|                0 |
++------------------+
+8 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> select DIV(salary,1000) from employee;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'DIV(salary,1000) from employee' at line 1
+MariaDB [ExamC0711561]> select salary/1000 from employee;
++-------------+
+| salary/1000 |
++-------------+
+|         7.5 |
+|          10 |
+|         7.5 |
+|          20 |
+|       0.025 |
+|           5 |
+|          10 |
+|           5 |
++-------------+
+8 rows in set (0.03 sec)
+
+MariaDB [ExamC0711561]> SELECT CONCAT(name, ' is ', position,  ' and earns $', salary, '.00/month') FROM employee;
++----------------------------------------------------------------------+
+| CONCAT(name, ' is ', position,  ' and earns $', salary, '.00/month') |
++----------------------------------------------------------------------+
+| Phillip J. Fry is Delivery boy and earns $7500.00/month              |
+| Turanga Leela is Captain and earns $10000.00/month                   |
+| Bender Bending Rodriguez is Robot and earns $7500.00/month           |
+| Hubert J. Farnsworth is CEO and earns $20000.00/month                |
+| John A. Zoidberg is Physician and earns $25.00/month                 |
+| Amy Wong is Intern and earns $5000.00/month                          |
+| Hermes Conrad is Bureaucrat and earns $10000.00/month                |
+| Scruffy Scruffington is Janitor and earns $5000.00/month             |
++----------------------------------------------------------------------+
+8 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> CREATE VIEW v9 AS SELECT CONCAT(name, ' is ', position,  ' and earns $', salary, '.00/month') FROM employee;
+Query OK, 0 rows affected (0.06 sec)
+
+MariaDB [ExamC0711561]> SELECT * FROM v9;
++------------------------------------------------------------+
+| Name_exp_1                                                 |
++------------------------------------------------------------+
+| Phillip J. Fry is Delivery boy and earns $7500.00/month    |
+| Turanga Leela is Captain and earns $10000.00/month         |
+| Bender Bending Rodriguez is Robot and earns $7500.00/month |
+| Hubert J. Farnsworth is CEO and earns $20000.00/month      |
+| John A. Zoidberg is Physician and earns $25.00/month       |
+| Amy Wong is Intern and earns $5000.00/month                |
+| Hermes Conrad is Bureaucrat and earns $10000.00/month      |
+| Scruffy Scruffington is Janitor and earns $5000.00/month   |
++------------------------------------------------------------+
+8 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> CREATE VIEW v9 AS SELECT CONCAT(name, ' is ', position,  ' and earns $', format(salary. 'en_en)', '.00/month') FROM employee;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near ''en_en)', '.00/month') FROM employee' at line 1
+MariaDB [ExamC0711561]> CREATE VIEW v9 AS SELECT CONCAT(name, ' is ', position,  ' and earns $', format(salary. 'en_en'), '.00/month') FROM employee;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near ''en_en'), '.00/month') FROM employee' at line 1
+MariaDB [ExamC0711561]> CREATE VIEW v9 AS SELECT CONCAT(name, ' is ', position,  ' and earns $', format(salary, 'en_en'), '.00/month') FROM employee;
+ERROR 1271 (HY000): Illegal mix of collations for operation 'concat'
+MariaDB [ExamC0711561]> select * from shipment;
++------------+--------------+---------+--------+
+| ShipmentID | ShipmentDate | Manager | Planet |
++------------+--------------+---------+--------+
+|          1 | 3004-05-11   |       1 |      1 |
+|          2 | 3004-05-11   |       1 |      2 |
+|          3 | NULL         |       2 |      3 |
+|          4 | NULL         |       2 |      4 |
+|          5 | NULL         |       7 |      5 |
++------------+--------------+---------+--------+
+5 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT * FROM shipment WHERE shipmentDate IS NULL;
++------------+--------------+---------+--------+
+| ShipmentID | ShipmentDate | Manager | Planet |
++------------+--------------+---------+--------+
+|          3 | NULL         |       2 |      3 |
+|          4 | NULL         |       2 |      4 |
+|          5 | NULL         |       7 |      5 |
++------------+--------------+---------+--------+
+3 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT CURDATE;
+ERROR 1054 (42S22): Unknown column 'CURDATE' in 'field list'
+MariaDB [ExamC0711561]> SELECT CURDATE();
++------------+
+| CURDATE()  |
++------------+
+| 2017-09-18 |
++------------+
+1 row in set (0.00 sec)
+
+MariaDB [ExamC0711561]> UPDATE shipment SET shipmentDate = CURDATE() WHERE shipmentDate IS NULL;
+Query OK, 3 rows affected (0.06 sec)
+Rows matched: 3  Changed: 3  Warnings: 0
+
+MariaDB [ExamC0711561]> SELECT * FROM employee;
++------------+--------------------------+--------------+--------+-------------------------------------------------------------------------+
+| EmployeeID | Name                     | Position     | Salary | Remarks                                                                 |
++------------+--------------------------+--------------+--------+-------------------------------------------------------------------------+
+|          1 | Phillip J. Fry           | Delivery boy |   7500 | Not to be confused with the Philip J. Fry from Hovering Squid World 97a |
+|          2 | Turanga Leela            | Captain      |  10000 | NULL                                                                    |
+|          3 | Bender Bending Rodriguez | Robot        |   7500 | NULL                                                                    |
+|          4 | Hubert J. Farnsworth     | CEO          |  20000 | NULL                                                                    |
+|          5 | John A. Zoidberg         | Physician    |     25 | NULL                                                                    |
+|          6 | Amy Wong                 | Intern       |   5000 | NULL                                                                    |
+|          7 | Hermes Conrad            | Bureaucrat   |  10000 | NULL                                                                    |
+|          8 | Scruffy Scruffington     | Janitor      |   5000 | NULL                                                                    |
++------------+--------------------------+--------------+--------+-------------------------------------------------------------------------+
+8 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT * FROM employee WHERE remarks IS NULL;
++------------+--------------------------+------------+--------+---------+
+| EmployeeID | Name                     | Position   | Salary | Remarks |
++------------+--------------------------+------------+--------+---------+
+|          2 | Turanga Leela            | Captain    |  10000 | NULL    |
+|          3 | Bender Bending Rodriguez | Robot      |   7500 | NULL    |
+|          4 | Hubert J. Farnsworth     | CEO        |  20000 | NULL    |
+|          5 | John A. Zoidberg         | Physician  |     25 | NULL    |
+|          6 | Amy Wong                 | Intern     |   5000 | NULL    |
+|          7 | Hermes Conrad            | Bureaucrat |  10000 | NULL    |
+|          8 | Scruffy Scruffington     | Janitor    |   5000 | NULL    |
++------------+--------------------------+------------+--------+---------+
+7 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT * FROM employee WHERE remarks IS NULL;
++------------+--------------------------+------------+--------+---------+
+| EmployeeID | Name                     | Position   | Salary | Remarks |
++------------+--------------------------+------------+--------+---------+
+|          2 | Turanga Leela            | Captain    |  10000 | NULL    |
+|          3 | Bender Bending Rodriguez | Robot      |   7500 | NULL    |
+|          4 | Hubert J. Farnsworth     | CEO        |  20000 | NULL    |
+|          5 | John A. Zoidberg         | Physician  |     25 | NULL    |
+|          6 | Amy Wong                 | Intern     |   5000 | NULL    |
+|          7 | Hermes Conrad            | Bureaucrat |  10000 | NULL    |
+|          8 | Scruffy Scruffington     | Janitor    |   5000 | NULL    |
++------------+--------------------------+------------+--------+---------+
+7 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> UPDATE employee SET remarks = CONCAT(name, ' has been a very good employee') WHERE remarks IS NULL;
+Query OK, 7 rows affected (0.08 sec)
+Rows matched: 7  Changed: 7  Warnings: 0
+
+MariaDB [ExamC0711561]> UPDATE shipment SET shipmentDate = CURDATE() WHERE shipmentDate IS NULL;
+Query OK, 0 rows affected (0.00 sec)
+Rows matched: 0  Changed: 0  Warnings: 0
+
+MariaDB [ExamC0711561]> Query OK, 3 rows affected (0.06 sec)
+    -> Rows matched: 3  Changed: 3  Warnings: 0
+    -> ;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'Query OK, 3 rows affected (0.06 sec)
+Rows matched: 3  Changed: 3  Warnings: 0' at line 1
+MariaDB [ExamC0711561]> select * from employee;
++------------+--------------------------+--------------+--------+-------------------------------------------------------------------------+
+| EmployeeID | Name                     | Position     | Salary | Remarks                                                                 |
++------------+--------------------------+--------------+--------+-------------------------------------------------------------------------+
+|          1 | Phillip J. Fry           | Delivery boy |   7500 | Not to be confused with the Philip J. Fry from Hovering Squid World 97a |
+|          2 | Turanga Leela            | Captain      |  10000 | Turanga Leela has been a very good employee                             |
+|          3 | Bender Bending Rodriguez | Robot        |   7500 | Bender Bending Rodriguez has been a very good employee                  |
+|          4 | Hubert J. Farnsworth     | CEO          |  20000 | Hubert J. Farnsworth has been a very good employee                      |
+|          5 | John A. Zoidberg         | Physician    |     25 | John A. Zoidberg has been a very good employee                          |
+|          6 | Amy Wong                 | Intern       |   5000 | Amy Wong has been a very good employee                                  |
+|          7 | Hermes Conrad            | Bureaucrat   |  10000 | Hermes Conrad has been a very good employee                             |
+|          8 | Scruffy Scruffington     | Janitor      |   5000 | Scruffy Scruffington has been a very good employee                      |
++------------+--------------------------+--------------+--------+-------------------------------------------------------------------------+
+8 rows in set (0.02 sec)
+
+MariaDB [ExamC0711561]> SELECT employeeId, name, position, CONCAT('$', CONVERT(FORMAT(payment_amount, 2) using utf8)), '.00') as salary, remarks FROM employee;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near ') as salary, remarks FROM employee' at line 1
+MariaDB [ExamC0711561]> SELECT employeeId, name, position, CONCAT('$', CONVERT(FORMAT(payment_amount, 2) using utf8), '.00') as salary, remarks FROM employee;
+ERROR 1054 (42S22): Unknown column 'payment_amount' in 'field list'
+MariaDB [ExamC0711561]> SELECT employeeId, name, position, CONCAT('$', CONVERT(FORMAT(salary, 2) using utf8), '.00') as salary, remarks FROM employee;
++------------+--------------------------+--------------+---------------+-------------------------------------------------------------------------+
+| employeeId | name                     | position     | salary        | remarks                                                                 |
++------------+--------------------------+--------------+---------------+-------------------------------------------------------------------------+
+|          1 | Phillip J. Fry           | Delivery boy | $7,500.00.00  | Not to be confused with the Philip J. Fry from Hovering Squid World 97a |
+|          2 | Turanga Leela            | Captain      | $10,000.00.00 | Turanga Leela has been a very good employee                             |
+|          3 | Bender Bending Rodriguez | Robot        | $7,500.00.00  | Bender Bending Rodriguez has been a very good employee                  |
+|          4 | Hubert J. Farnsworth     | CEO          | $20,000.00.00 | Hubert J. Farnsworth has been a very good employee                      |
+|          5 | John A. Zoidberg         | Physician    | $25.00.00     | John A. Zoidberg has been a very good employee                          |
+|          6 | Amy Wong                 | Intern       | $5,000.00.00  | Amy Wong has been a very good employee                                  |
+|          7 | Hermes Conrad            | Bureaucrat   | $10,000.00.00 | Hermes Conrad has been a very good employee                             |
+|          8 | Scruffy Scruffington     | Janitor      | $5,000.00.00  | Scruffy Scruffington has been a very good employee                      |
++------------+--------------------------+--------------+---------------+-------------------------------------------------------------------------+
+8 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT employeeId, name, position, CONCAT('$', CONVERT(FORMAT(salary, 2) using utf8)) as salary, remarks FROM employee;
++------------+--------------------------+--------------+------------+-------------------------------------------------------------------------+
+| employeeId | name                     | position     | salary     | remarks                                                                 |
++------------+--------------------------+--------------+------------+-------------------------------------------------------------------------+
+|          1 | Phillip J. Fry           | Delivery boy | $7,500.00  | Not to be confused with the Philip J. Fry from Hovering Squid World 97a |
+|          2 | Turanga Leela            | Captain      | $10,000.00 | Turanga Leela has been a very good employee                             |
+|          3 | Bender Bending Rodriguez | Robot        | $7,500.00  | Bender Bending Rodriguez has been a very good employee                  |
+|          4 | Hubert J. Farnsworth     | CEO          | $20,000.00 | Hubert J. Farnsworth has been a very good employee                      |
+|          5 | John A. Zoidberg         | Physician    | $25.00     | John A. Zoidberg has been a very good employee                          |
+|          6 | Amy Wong                 | Intern       | $5,000.00  | Amy Wong has been a very good employee                                  |
+|          7 | Hermes Conrad            | Bureaucrat   | $10,000.00 | Hermes Conrad has been a very good employee                             |
+|          8 | Scruffy Scruffington     | Janitor      | $5,000.00  | Scruffy Scruffington has been a very good employee                      |
++------------+--------------------------+--------------+------------+-------------------------------------------------------------------------+
+8 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT employeeId, name, position, CONCAT('$', CONVERT(FORMAT(salary, 2) using utf8)) as salary, remarks FROM employee;
++------------+--------------------------+--------------+------------+-------------------------------------------------------------------------+
+| employeeId | name                     | position     | salary     | remarks                                                                 |
++------------+--------------------------+--------------+------------+-------------------------------------------------------------------------+
+|          1 | Phillip J. Fry           | Delivery boy | $7,500.00  | Not to be confused with the Philip J. Fry from Hovering Squid World 97a |
+|          2 | Turanga Leela            | Captain      | $10,000.00 | Turanga Leela has been a very good employee                             |
+|          3 | Bender Bending Rodriguez | Robot        | $7,500.00  | Bender Bending Rodriguez has been a very good employee                  |
+|          4 | Hubert J. Farnsworth     | CEO          | $20,000.00 | Hubert J. Farnsworth has been a very good employee                      |
+|          5 | John A. Zoidberg         | Physician    | $25.00     | John A. Zoidberg has been a very good employee                          |
+|          6 | Amy Wong                 | Intern       | $5,000.00  | Amy Wong has been a very good employee                                  |
+|          7 | Hermes Conrad            | Bureaucrat   | $10,000.00 | Hermes Conrad has been a very good employee                             |
+|          8 | Scruffy Scruffington     | Janitor      | $5,000.00  | Scruffy Scruffington has been a very good employee                      |
++------------+--------------------------+--------------+------------+-------------------------------------------------------------------------+
+8 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT CONCAT(name, ' is ', position,  ' and earns $', CONVERT(FORMAT(salary, 2) using utf8), '/month') FROM employee;
++--------------------------------------------------------------------------------------------------+
+| CONCAT(name, ' is ', position,  ' and earns $', CONVERT(FORMAT(salary, 2) using utf8), '/month') |
++--------------------------------------------------------------------------------------------------+
+| Phillip J. Fry is Delivery boy and earns $7,500.00/month                                         |
+| Turanga Leela is Captain and earns $10,000.00/month                                              |
+| Bender Bending Rodriguez is Robot and earns $7,500.00/month                                      |
+| Hubert J. Farnsworth is CEO and earns $20,000.00/month                                           |
+| John A. Zoidberg is Physician and earns $25.00/month                                             |
+| Amy Wong is Intern and earns $5,000.00/month                                                     |
+| Hermes Conrad is Bureaucrat and earns $10,000.00/month                                           |
+| Scruffy Scruffington is Janitor and earns $5,000.00/month                                        |
++--------------------------------------------------------------------------------------------------+
+8 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT CONCAT(name, ' is ', position,  ' and earns $', CONVERT(FORMAT(salary, 2) using utf8), '/month') as employeeDescription FROM employee;
++-------------------------------------------------------------+
+| employeeDescription                                         |
++-------------------------------------------------------------+
+| Phillip J. Fry is Delivery boy and earns $7,500.00/month    |
+| Turanga Leela is Captain and earns $10,000.00/month         |
+| Bender Bending Rodriguez is Robot and earns $7,500.00/month |
+| Hubert J. Farnsworth is CEO and earns $20,000.00/month      |
+| John A. Zoidberg is Physician and earns $25.00/month        |
+| Amy Wong is Intern and earns $5,000.00/month                |
+| Hermes Conrad is Bureaucrat and earns $10,000.00/month      |
+| Scruffy Scruffington is Janitor and earns $5,000.00/month   |
++-------------------------------------------------------------+
+8 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT * FROM v9;
++------------------------------------------------------------+
+| Name_exp_1                                                 |
++------------------------------------------------------------+
+| Phillip J. Fry is Delivery boy and earns $7500.00/month    |
+| Turanga Leela is Captain and earns $10000.00/month         |
+| Bender Bending Rodriguez is Robot and earns $7500.00/month |
+| Hubert J. Farnsworth is CEO and earns $20000.00/month      |
+| John A. Zoidberg is Physician and earns $25.00/month       |
+| Amy Wong is Intern and earns $5000.00/month                |
+| Hermes Conrad is Bureaucrat and earns $10000.00/month      |
+| Scruffy Scruffington is Janitor and earns $5000.00/month   |
++------------------------------------------------------------+
+8 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> DROP VIEW v9;
+Query OK, 0 rows affected (0.00 sec)
+
+MariaDB [ExamC0711561]> CREATE VIEW v9 AS SELECT CONCAT(name, ' is ', position,  ' and earns $', CONVERT(FORMAT(salary, 2) using utf8), '/month') as employeeDescription FROM employee;
+Query OK, 0 rows affected (0.05 sec)
+
+MariaDB [ExamC0711561]> SELECT * FROM v9;
++-------------------------------------------------------------+
+| employeeDescription                                         |
++-------------------------------------------------------------+
+| Phillip J. Fry is Delivery boy and earns $7,500.00/month    |
+| Turanga Leela is Captain and earns $10,000.00/month         |
+| Bender Bending Rodriguez is Robot and earns $7,500.00/month |
+| Hubert J. Farnsworth is CEO and earns $20,000.00/month      |
+| John A. Zoidberg is Physician and earns $25.00/month        |
+| Amy Wong is Intern and earns $5,000.00/month                |
+| Hermes Conrad is Bureaucrat and earns $10,000.00/month      |
+| Scruffy Scruffington is Janitor and earns $5,000.00/month   |
++-------------------------------------------------------------+
+8 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT * FROM shipment;
++------------+--------------+---------+--------+
+| ShipmentID | ShipmentDate | Manager | Planet |
++------------+--------------+---------+--------+
+|          1 | 3004-05-11   |       1 |      1 |
+|          2 | 3004-05-11   |       1 |      2 |
+|          3 | 2017-09-18   |       2 |      3 |
+|          4 | 2017-09-18   |       2 |      4 |
+|          5 | 2017-09-18   |       7 |      5 |
++------------+--------------+---------+--------+
+5 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT * FROM employee;
++------------+--------------------------+--------------+--------+-------------------------------------------------------------------------+
+| EmployeeID | Name                     | Position     | Salary | Remarks                                                                 |
++------------+--------------------------+--------------+--------+-------------------------------------------------------------------------+
+|          1 | Phillip J. Fry           | Delivery boy |   7500 | Not to be confused with the Philip J. Fry from Hovering Squid World 97a |
+|          2 | Turanga Leela            | Captain      |  10000 | Turanga Leela has been a very good employee                             |
+|          3 | Bender Bending Rodriguez | Robot        |   7500 | Bender Bending Rodriguez has been a very good employee                  |
+|          4 | Hubert J. Farnsworth     | CEO          |  20000 | Hubert J. Farnsworth has been a very good employee                      |
+|          5 | John A. Zoidberg         | Physician    |     25 | John A. Zoidberg has been a very good employee                          |
+|          6 | Amy Wong                 | Intern       |   5000 | Amy Wong has been a very good employee                                  |
+|          7 | Hermes Conrad            | Bureaucrat   |  10000 | Hermes Conrad has been a very good employee                             |
+|          8 | Scruffy Scruffington     | Janitor      |   5000 | Scruffy Scruffington has been a very good employee                      |
++------------+--------------------------+--------------+--------+-------------------------------------------------------------------------+
+8 rows in set (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT c.name 
+    -> FROM client sender, client recipient, package p
+    -> WHERE sender.accountNumber = p.sender
+    -> AND recipient.accountNumber = p.recipient 
+    -> AND contents = 'Undeclared';
+ERROR 1054 (42S22): Unknown column 'c.name' in 'field list'
+MariaDB [ExamC0711561]> SELECT employeeId, name, position, CONCAT('$', FORMAT(salary, 'en_en'), '.00') as salary, remarks FROM employee;
++------------+--------------------------+--------------+------------+-------------------------------------------------------------------------+
+| employeeId | name                     | position     | salary     | remarks                                                                 |
++------------+--------------------------+--------------+------------+-------------------------------------------------------------------------+
+|          1 | Phillip J. Fry           | Delivery boy | $7,500.00  | Not to be confused with the Philip J. Fry from Hovering Squid World 97a |
+|          2 | Turanga Leela            | Captain      | $10,000.00 | Turanga Leela has been a very good employee                             |
+|          3 | Bender Bending Rodriguez | Robot        | $7,500.00  | Bender Bending Rodriguez has been a very good employee                  |
+|          4 | Hubert J. Farnsworth     | CEO          | $20,000.00 | Hubert J. Farnsworth has been a very good employee                      |
+|          5 | John A. Zoidberg         | Physician    | $25.00     | John A. Zoidberg has been a very good employee                          |
+|          6 | Amy Wong                 | Intern       | $5,000.00  | Amy Wong has been a very good employee                                  |
+|          7 | Hermes Conrad            | Bureaucrat   | $10,000.00 | Hermes Conrad has been a very good employee                             |
+|          8 | Scruffy Scruffington     | Janitor      | $5,000.00  | Scruffy Scruffington has been a very good employee                      |
++------------+--------------------------+--------------+------------+-------------------------------------------------------------------------+
+8 rows in set, 8 warnings (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT CONCAT('$', FORMAT(salary, 'en_en'), '.00') as salary, remarks FROM employee;
++------------+-------------------------------------------------------------------------+
+| salary     | remarks                                                                 |
++------------+-------------------------------------------------------------------------+
+| $7,500.00  | Not to be confused with the Philip J. Fry from Hovering Squid World 97a |
+| $10,000.00 | Turanga Leela has been a very good employee                             |
+| $7,500.00  | Bender Bending Rodriguez has been a very good employee                  |
+| $20,000.00 | Hubert J. Farnsworth has been a very good employee                      |
+| $25.00     | John A. Zoidberg has been a very good employee                          |
+| $5,000.00  | Amy Wong has been a very good employee                                  |
+| $10,000.00 | Hermes Conrad has been a very good employee                             |
+| $5,000.00  | Scruffy Scruffington has been a very good employee                      |
++------------+-------------------------------------------------------------------------+
+8 rows in set, 8 warnings (0.00 sec)
+
+MariaDB [ExamC0711561]> SELECT CONCAT(name, '$', FORMAT(salary, 'en_en'), '.00') as salary, remarks FROM employee;
+ERROR 1271 (HY000): Illegal mix of collations for operation 'concat'
